@@ -15,10 +15,6 @@ main =
         }
 
 
-
--- MODEL
-
-
 type Dir
     = Left
     | Up
@@ -47,10 +43,6 @@ init =
       }
     , Cmd.none
     )
-
-
-
--- UPDATE
 
 
 subscriptions : Model -> Sub Msg
@@ -127,10 +119,6 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Step _ ->
-            -- If ant is on a white square:
-            -- Turn 90deg right, flip color of current square, move forward one unit
-            -- If ant is on a black square:
-            -- Turn 90deg left, flip color of current square, move foward one unit
             if isBlackSquare ( model.antX, model.antY ) model.blackSquares then
                 let
                     nextDir =
@@ -155,10 +143,6 @@ update msg model =
                         step ( model.antX, model.antY ) nextDir
                 in
                     ( { model | antX = nextX, antY = nextY, antDir = nextDir, blackSquares = nextBlacks }, Cmd.none )
-
-
-
--- VIEW
 
 
 cellColor : Int -> Int -> Int -> Int -> List ( Int, Int ) -> String
