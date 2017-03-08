@@ -38,10 +38,10 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { width = 20
-      , height = 20
-      , antX = 10
-      , antY = 10
+    ( { width = 50
+      , height = 30
+      , antX = 20
+      , antY = 15
       , antDir = Right
       , blackSquares = []
       }
