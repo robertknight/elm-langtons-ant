@@ -1,13 +1,14 @@
 import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
 import Html.Attributes exposing (style)
+import Time exposing (..)
 
 
 main =
-  Html.beginnerProgram
-    { model = model
+  Html.program
+    { init = init
     , view = view
     , update = update
+    , subscriptions = subscriptions
     }
 
 
@@ -26,19 +27,23 @@ type alias Model =
   }
 
 
-model : Model
-model =
-  { width = 20
+init : (Model, Cmd Msg)
+init =
+  ({ width = 20
   , height = 20
   , antX = 10
   , antY = 10
   , antDir = Right
   , blackSquares = []
-  }
+  }, Cmd.none)
 
 
 
 -- UPDATE
+subscriptions model =
+  every (20 * millisecond) Step
+
+
 turnRight : Dir -> Dir
 turnRight d = case d of
   Right -> Down
@@ -56,7 +61,7 @@ turnLeft d = case d of
 
 
 type Msg
-  = Step
+  = Step Time
 
 
 isBlackSquare : (Int,Int) -> List (Int,Int) -> Bool
@@ -80,10 +85,10 @@ flipSquare (x,y) blackSquares =
     (x,y) :: blackSquares
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Step ->
+    Step _ ->
       -- If ant is on a white square:
       -- Turn 90deg right, flip color of current square, move forward one unit
       -- If ant is on a black square:
@@ -94,17 +99,18 @@ update msg model =
             nextBlacks = flipSquare (model.antX,model.antY) model.blackSquares
             (nextX, nextY) = step (model.antX,model.antY) nextDir
         in
-            { model | antX = nextX, antY = nextY, antDir = nextDir, blackSquares = nextBlacks }
+            ({ model | antX = nextX, antY = nextY, antDir = nextDir, blackSquares = nextBlacks }, Cmd.none)
       else
         let
             nextDir = turnRight model.antDir
             nextBlacks = flipSquare (model.antX,model.antY) model.blackSquares
             (nextX, nextY) = step (model.antX,model.antY) nextDir
         in
-            { model | antX = nextX, antY = nextY, antDir = nextDir, blackSquares = nextBlacks }
+            ({ model | antX = nextX, antY = nextY, antDir = nextDir, blackSquares = nextBlacks }, Cmd.none)
 
 
 -- VIEW
+cellColor : Int -> Int -> Int -> Int -> List (Int,Int) -> String
 cellColor r c antX antY blackSquares =
   let
       isBlack = isBlackSquare (c,r) blackSquares
@@ -145,6 +151,6 @@ view model =
       viewRow = \r ->
         div [style (rowStyle r)] (List.map (viewCell r) cols)
   in
-    div [ onClick Step ]
+    div []
       (List.map viewRow rows)
       
